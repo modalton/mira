@@ -1,5 +1,6 @@
 module.exports = exports = class Restraunt {
   constructor(name, opening_day, closing_day, opening_time, closing_time) {
+    //Js formatter made this particually ugly. Just argument asserts so can skip over.
     if (!(typeof name === "string" || name instanceof String))
       throw new TypeError("Restaurant name must be string type");
     if (!Number.isInteger(opening_day))
@@ -28,6 +29,7 @@ module.exports = exports = class Restraunt {
       throw new TypeError(
         "Restraunt closing_time must be object w/hr & min properties"
       );
+    //End of argument asserts
 
     this.name = name;
     this.opening_day = opening_day;
