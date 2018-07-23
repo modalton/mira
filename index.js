@@ -3,24 +3,28 @@ const fs = require('fs');
 
 
 function findOpenRestaurants(csv_filename, search_datetime) {
-  const file = fs.readFileSync(csv_filename);
+  if(!(search_datetime instanceof Date)) throw new TypeError("search_datetime must be Date object");
+  if(!(typeof csv_filename === 'string' || csv_filename instanceof String)) throw new TypeError("csc_filename must be string type");
 
-  function createHrMinDate(str,ampm){
+  //Parsing helper function to make basic time object
+  function createHrMin(str,ampm){
     let clock_obj = {hr:0,min:0};
     if(str.indexOf(':')!=-1){
       const hr_and_min = str.split(':');
-      const hrs = (ampm.trim() === "am") ? parseInt(hr_and_min[0]) : parseInt(hr_and_min[0])+12;
+      const hrs = (ampm.trim() === "am")  ? parseInt(hr_and_min[0])%12 : parseInt(hr_and_min[0])%12+12;
       clock_obj.hr = hrs;
       clock_obj.min = parseInt(hr_and_min[1]);
       
     }else{
-      const hrs = (ampm.trim() === "am") ? parseInt(str) : parseInt(str)+12;
+      const hrs = (ampm.trim() === "am") ? parseInt(str)%12 : parseInt(str)%12+12;
       clock_obj.hr = hrs;
     }
     
     return clock_obj;
   }
 
+  //Format specific parsing line by line (As per spec assume correct format).
+  //Returns array of restraunt objects
   function parseFile(file){
     const days_enum = {
       "Sun":0,
@@ -32,26 +36,23 @@ function findOpenRestaurants(csv_filename, search_datetime) {
       "Sat":6
     };
 
-    let rest = file.toString().split("\r\n").filter(el=>el!=='').map(line => {
+    return file.split("\r\n").filter(el=>el!=='').map(line => {
       const match = line.match(/"(.+)","(\w+)-(\w+) (\S+) (am |pm )- (\S+) (am|pm)"/);
       const name = match[1];
       const opening_day = days_enum[match[2]];
       const closing_day = days_enum[match[3]];
-      const opening_time = createHrMinDate(match[4],match[5]);
-      const closing_time = createHrMinDate(match[6],match[7]);
+      const opening_time = createHrMin(match[4],match[5]);
+      const closing_time = createHrMin(match[6],match[7]);
       return new Restaurant(name,opening_day,closing_day,opening_time,closing_time);
     });
-
-
-
-    rest.filter(r=> r.isOpenAt(new Date(Date.now()))).map(el => el.stats())
   }
-  
 
-  parseFile(file);
+
+  const file = fs.readFileSync(csv_filename).toString();
+  const all_restaurants = parseFile(file);
+  return all_restaurants.filter(rest => rest.isOpenAt(search_datetime)).map(rest => rest.name);
 }
 
-findOpenRestaurants("restaurants.txt");
+   
 
-
-
+module.exports = exports = findOpenRestaurants;

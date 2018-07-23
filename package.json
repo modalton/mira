@@ -1,0 +1,22 @@
+{
+  "name": "mira",
+  "version": "1.0.0",
+  "description": "Coding challenge",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/bin/mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/modalton/mira.git"
+  },
+  "author": "Michael Dalton",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/modalton/mira/issues"
+  },
+  "homepage": "https://github.com/modalton/mira#readme",
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
